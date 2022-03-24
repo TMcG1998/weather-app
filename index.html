@@ -12,9 +12,35 @@
 </head>
 
 <body>
-    
 
-    <script src="./assets/script.js"></script>
+  <header class="hero bg-light">
+    <h1 class="text-center">Weather Dashboard</h1>
+  </header>
+  
+  <main class="container w-100">
+    <div class="row">
+      
+      <div class="col-4">
+        <div class="card mt-3">
+          <h3 class="card-header text-uppercase">Search for a City:</h3>
+          <form id="user-form" class="card-body">
+            <input name="username" id="username" type="text" autofocus="true" class="form-input" placeholder="Seattle" />
+            <button type="submit" class="btn btn-primary">Search</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-8" id="today-result">
+        <h2 class="subtitle align-bottom">Showing Results for: <span id="search-term"></span></h2>
+        <div id="results-container" class="list-group"></div>
+      </div>
+    </div>
+
+  </main>
+  
+
+  
+  <script src="./assets/script.js"></script>
 </body>
 
 </html>
