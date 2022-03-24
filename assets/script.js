@@ -3,6 +3,7 @@ const apiKey = "5ee9e8bf24401b639ee5aedbea5aea23"
 var userFormEl = document.querySelector("#user-form");
 var cityInputEl = document.querySelector("#city");
 var searchTermEl = document.querySelector("#search-term");
+var cityIconEl = document.querySelector("#city-icon");
 
 var todayResultEl = document.querySelector("#today-result");
 
@@ -65,7 +66,10 @@ var getWeather = function(lat, lon, name) {
             response.json().then(function(data) {
                 // Display the name, date, icon of conditions, temp
                 // humidity, wind speed, UV index
+                var iconUrl = "http://openweathermap.org/img/wn/" + data.current.weather[0].icon + ".png";
+                
                 searchTermEl.textContent = name + " (" + today + ")";
+                cityIconEl.setAttribute("src", iconUrl);
 
                 // Update today's information accordingly
                 temperatureEl.textContent = "Temperature: " + data.current.temp + "F";
@@ -75,8 +79,8 @@ var getWeather = function(lat, lon, name) {
                 
                 updateHistory(name);
 
-                console.log(searches);
-                console.log(data);
+                // console.log(searches);
+                // console.log(data);
             })
         } else {
             alert("Error: Cannot find the weather for that location.")
@@ -96,7 +100,7 @@ var updateHistory = function(city) {
         searches.unshift(city);
         var newBtnEl = document.createElement("button");
         newBtnEl.textContent = city;
-        newBtnEl.className = "history-btn";
+        newBtnEl.classList = "btn btn-secondary history-btn";
 
         searchHistoryEl.insertBefore(newBtnEl, searchHistoryEl.firstChild);
         // To prevent from an infinitely long history, we limit it to size of 5
