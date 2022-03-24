@@ -4,9 +4,31 @@
 }
 
 #search-history {
-    padding: 0;
+    padding: 0 5px 0 0;
 }
 
 .row {
     background-color: #ADD8E6;
+}
+
+#five-day-forecast {
+    border-left: 1px solid;
+}
+
+.uv-index {
+    padding: 5px;
+    max-width: 150px;
+    border-radius: 8px;
+}
+
+.low {
+    background-color: #2E8B57;
+}
+
+.moderate {
+    background-color: #FF8C00;
+}
+
+.high {
+    background-color: #B22222;
 }

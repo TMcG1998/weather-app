@@ -76,6 +76,14 @@ var getWeather = function(lat, lon, name) {
                 humidityEl.textContent = "Humidity: " + data.current.humidity;
                 windspeedEl.textContent =  "Wind Speed: " + data.current.wind_speed + " MPH";
                 uvindexEl.textContent = "UV Index: " + data.current.uvi;
+
+                if(data.current.uvi < 2) {
+                    uvindexEl.classList = "low uv-index";
+                } else if (data.current.uvi <= 5) {
+                    uvindexEl.classList = "moderate uv-index";
+                } else {
+                    uvindexEl.classList = "high uv-index";
+                }
                 
                 updateHistory(name);
 
