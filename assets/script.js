@@ -73,12 +73,7 @@ var getWeather = function(lat, lon, name) {
                 windspeedEl.textContent =  "Wind Speed: " + data.current.wind_speed + " MPH";
                 uvindexEl.textContent = "UV Index: " + data.current.uvi;
                 
-                // Add this search to the history
-                searches.unshift(name);
-                // To prevent from an infinitely long history, we limit it to size of 5
-                if(searches.length > 5) {
-                    searches.pop();
-                }
+                updateHistory(name);
 
                 console.log(searches);
                 console.log(data);
@@ -92,6 +87,33 @@ var getWeather = function(lat, lon, name) {
     });
 }
 
+//Update the search history array and display it
+var updateHistory = function(city) {
+    // Add this search to the history
+    // Make sure the array doesn't already have this.
+    // No need to make multiple buttons of the same location.
+    if(!searches.includes(city)) {
+        searches.unshift(city);
+        var newBtnEl = document.createElement("button");
+        newBtnEl.textContent = city;
+        newBtnEl.className = "history-btn";
+
+        searchHistoryEl.insertBefore(newBtnEl, searchHistoryEl.firstChild);
+        // To prevent from an infinitely long history, we limit it to size of 5
+        if(searches.length > 5) {
+            searches.pop();
+            searchHistoryEl.removeChild(searchHistoryEl.children[5]);
+        }
+    }
+}
+
+// Handle the search of an old search
+var historyHandler = function(event) {
+    var city = event.target.textContent;
+    getLocation(city);
+}
+
+// Handle the search
 var formSubmitHandler = function(event) {
     event.preventDefault();
     var city = cityInputEl.value.trim();
@@ -104,4 +126,6 @@ var formSubmitHandler = function(event) {
     }
 }
 
+
 userFormEl.addEventListener("submit", formSubmitHandler);
+searchHistoryEl.addEventListener("click", historyHandler);
