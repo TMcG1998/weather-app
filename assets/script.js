@@ -1,5 +1,7 @@
+// THE API KEY GIVEN TO US AFTER REGISTERING 
+// -- IT IS NECESSARY TO MAKE REQUESTS TO THEIR API --
 const apiKey = "5ee9e8bf24401b639ee5aedbea5aea23"
-
+// Store our HTML elements for later
 var userFormEl = document.querySelector("#user-form");
 var cityInputEl = document.querySelector("#city");
 var searchTermEl = document.querySelector("#search-term");
@@ -15,6 +17,9 @@ var uvindexEl = document.querySelector("#uv-index");
 
 var searchHistoryEl = document.querySelector("#search-history");
 
+// Store an array of searches and a string of last search
+// These will be store into an object which will later be saved to
+// local storage to be used later to help keep information persistent
 var searches = [];
 var lastSearch = "";
 
@@ -219,7 +224,6 @@ var loadWeather = function() {
         }
         getLocation(saveObject.last);
     }
-    
 }
 
 // Handle the search of an old search
