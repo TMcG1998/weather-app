@@ -93,7 +93,7 @@ var getWeather = function(lat, lon, name) {
                     uvindexEl.classList = "high uv-index";
                 }
                 
-                updateHistory(name);
+                updateHistory(name, false);
                 getNextFive(data);
             })
         } else {
@@ -106,7 +106,7 @@ var getWeather = function(lat, lon, name) {
 }
 
 //Update the search history array and display it
-var updateHistory = function(city) {
+var updateHistory = function(city, isLoad) {
     // Add this search to the history
     // Make sure the array doesn't already have this.
     // No need to make multiple buttons of the same location.
@@ -116,19 +116,23 @@ var updateHistory = function(city) {
     lastSearch = city;
 
     if(!searches.includes(city)) {
-        searches.unshift(city);
         var newBtnEl = document.createElement("button");
         newBtnEl.textContent = city;
         newBtnEl.classList = "btn btn-secondary history-btn";
-
+        
+        searches.push(city);
         searchHistoryEl.insertBefore(newBtnEl, searchHistoryEl.firstChild);
+        
         // To prevent from an infinitely long history, we limit it to size of 5
         if(searches.length > 5) {
             searches.pop();
             searchHistoryEl.removeChild(searchHistoryEl.children[5]);
         }
     }
-    saveWeather();
+    // prevent an immediate save while looping through the local storage
+    if(!isLoad) {
+        saveWeather();
+    }
 }
 
 // Get the next 5 days, then format and display accordingly.
@@ -150,6 +154,7 @@ var getNextFive = function(data) {
         var mm = targetDate.getMonth() + 1; // 0 is January, so we must add 1
         var yyyy = targetDate.getFullYear();
         
+        // Set the 5 variables needed to populate the data of each day
         var dateString = mm + "/" + dd + "/" + yyyy;
         var iconUrl = "http://openweathermap.org/img/wn/" + thisDay.weather[0].icon + "@2x.png";
         var temperature = "Temperature: " + thisDay.temp.max + "F";
@@ -177,6 +182,7 @@ var getNextFive = function(data) {
         var humidityEl = document.createElement("p");
         humidityEl.textContent = humidity;
 
+        // Add these elements to a div that will hold them, then put that div into our 5 day forecast
         newDay.appendChild(dateEl);
         newDay.appendChild(iconEl);
         newDay.appendChild(temperatureEl);
@@ -192,6 +198,28 @@ var saveWeather = function() {
     saveObject.history = [...searches];
     saveObject.last = lastSearch;
     localStorage.setItem("searches", JSON.stringify(saveObject));
+}
+
+// Load data from the local storage once the page is opened. If no local storage, display a default
+// Otherwise, display the current information for the last city the user searched.
+var loadWeather = function() {
+    saveObject = JSON.parse(localStorage.getItem("searches"));
+    
+    if(!saveObject) {
+        saveObject = {
+            history: searches,
+            last: lastSearch
+        }
+        return;
+    }
+
+    if(saveObject.history.length > 0) {
+        for(let i = 0; i < saveObject.history.length; i++) {
+            updateHistory(saveObject.history[i], true);
+        }
+        getLocation(saveObject.last);
+    }
+    
 }
 
 // Handle the search of an old search
@@ -212,6 +240,8 @@ var formSubmitHandler = function(event) {
         alert("Please enter a location to search.");
     }
 }
+
+loadWeather();
 
 // Listen :)
 userFormEl.addEventListener("submit", formSubmitHandler);
