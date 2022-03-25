@@ -42,7 +42,7 @@ today = mm + '/' + dd + '/' + yyyy;
 // The user will enter this location because they most likely
 // Will not know the exact geographic coordinates of the place they're searching
 var getLocation = function(location) {
-    var apiUrl = "http://api.openweathermap.org/geo/1.0/direct?q=" + location + "&appid=" + apiKey;
+    var apiUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + location + "&appid=" + apiKey;
 
     fetch(apiUrl).then(function(response) {
         if(response.ok) {
@@ -161,7 +161,7 @@ var getNextFive = function(data) {
         
         // Set the 5 variables needed to populate the data of each day
         var dateString = mm + "/" + dd + "/" + yyyy;
-        var iconUrl = "http://openweathermap.org/img/wn/" + thisDay.weather[0].icon + "@2x.png";
+        var iconUrl = "https://openweathermap.org/img/wn/" + thisDay.weather[0].icon + "@2x.png";
         var temperature = "Temperature: " + thisDay.temp.max + "F";
         var windSpeed = "Wind Speed: " + thisDay.wind_speed + "MPH";
         var humidity = "Humidity: " + thisDay.humidity + "%";
