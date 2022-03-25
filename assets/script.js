@@ -6,6 +6,7 @@ var searchTermEl = document.querySelector("#search-term");
 var cityIconEl = document.querySelector("#city-icon");
 
 var todayResultEl = document.querySelector("#today-result");
+var fiveForecastEl = document.querySelector("#five-day-forecast");
 
 var temperatureEl = document.querySelector("#temperature");
 var humidityEl = document.querySelector("#humidity");
@@ -15,6 +16,12 @@ var uvindexEl = document.querySelector("#uv-index");
 var searchHistoryEl = document.querySelector("#search-history");
 
 var searches = [];
+var lastSearch = "";
+
+var saveObject = {
+    history: [],
+    last: ""
+}
 
 // This code to produce the date that will later be used was created by someone else.
 // I used this code and not another API for the sake of simplicity. The original code was taken from:
@@ -35,7 +42,7 @@ var getLocation = function(location) {
     fetch(apiUrl).then(function(response) {
         if(response.ok) {
             response.json().then(function(data) {
-                console.log(data);
+                
                 if(data.length === 0) {
                     alert("Error: Cannot find that location.");
                     return;
@@ -57,13 +64,13 @@ var getLocation = function(location) {
 // After the location is found, we will enter the coordinates to 
 // fetch the weather conditions at that place
 var getWeather = function(lat, lon, name) {
-    console.log(lat, lon);
 
     var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&units=imperial&appid=" + apiKey;
 
     fetch(apiUrl).then(function(response) {
         if(response.ok) {
             response.json().then(function(data) {
+                
                 // Display the name, date, icon of conditions, temp
                 // humidity, wind speed, UV index
                 var iconUrl = "http://openweathermap.org/img/wn/" + data.current.weather[0].icon + ".png";
@@ -73,10 +80,11 @@ var getWeather = function(lat, lon, name) {
 
                 // Update today's information accordingly
                 temperatureEl.textContent = "Temperature: " + data.current.temp + "F";
-                humidityEl.textContent = "Humidity: " + data.current.humidity;
+                humidityEl.textContent = "Humidity: " + data.current.humidity + "%";
                 windspeedEl.textContent =  "Wind Speed: " + data.current.wind_speed + " MPH";
                 uvindexEl.textContent = "UV Index: " + data.current.uvi;
 
+                // Determine uv-index severity
                 if(data.current.uvi < 2) {
                     uvindexEl.classList = "low uv-index";
                 } else if (data.current.uvi <= 5) {
@@ -86,9 +94,7 @@ var getWeather = function(lat, lon, name) {
                 }
                 
                 updateHistory(name);
-
-                // console.log(searches);
-                // console.log(data);
+                getNextFive(data);
             })
         } else {
             alert("Error: Cannot find the weather for that location.")
@@ -104,6 +110,11 @@ var updateHistory = function(city) {
     // Add this search to the history
     // Make sure the array doesn't already have this.
     // No need to make multiple buttons of the same location.
+    // However we update the last search to store this for loading.
+    // That way even if the buttons don't update, you'll still
+    // come back to the last city you searched for.
+    lastSearch = city;
+
     if(!searches.includes(city)) {
         searches.unshift(city);
         var newBtnEl = document.createElement("button");
@@ -117,6 +128,70 @@ var updateHistory = function(city) {
             searchHistoryEl.removeChild(searchHistoryEl.children[5]);
         }
     }
+    saveWeather();
+}
+
+// Get the next 5 days, then format and display accordingly.
+var getNextFive = function(data) {
+    // Check if we already have 5 days of forecasting displayed. If we do, remove them.
+    var collection = document.querySelectorAll(".forecast");
+    for(let i = 0; i < collection.length; i++) {
+        collection[i].remove();
+    }
+    
+    for(var i = 1; i < 6; i++) {
+        var thisDay = data.daily[i];
+        // Get the future date. How many days in the future from now is determined
+        // by i, which conveniently is already 1 since we already captured today's weather
+        // This code block to create these dates was taken from: https://stackoverflow.com/questions/3572561/set-date-10-days-in-the-future-and-format-to-dd-mm-yyyy-e-g-21-08-2010
+        var targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + i);
+        var dd = targetDate.getDate();
+        var mm = targetDate.getMonth() + 1; // 0 is January, so we must add 1
+        var yyyy = targetDate.getFullYear();
+        
+        var dateString = mm + "/" + dd + "/" + yyyy;
+        var iconUrl = "http://openweathermap.org/img/wn/" + thisDay.weather[0].icon + "@2x.png";
+        var temperature = "Temperature: " + thisDay.temp.max + "F";
+        var windSpeed = "Wind Speed: " + thisDay.wind_speed + "MPH";
+        var humidity = "Humidity: " + thisDay.humidity + "%";
+
+        // Create 5 elements containing proper dates, as well as
+        // Icons, Temperature, Wind Speed, and Humidity
+        var newDay = document.createElement("div");
+        newDay.classList = "col forecast"
+
+        var dateEl = document.createElement("h6");
+        dateEl.textContent = dateString;
+        dateEl.className = "text-center";
+
+        var iconEl = document.createElement("img");
+        iconEl.setAttribute("src", iconUrl);
+
+        var temperatureEl = document.createElement("p");
+        temperatureEl.textContent = temperature;
+
+        var windspeedEl = document.createElement("p");
+        windspeedEl.textContent = windSpeed;
+
+        var humidityEl = document.createElement("p");
+        humidityEl.textContent = humidity;
+
+        newDay.appendChild(dateEl);
+        newDay.appendChild(iconEl);
+        newDay.appendChild(temperatureEl);
+        newDay.appendChild(windspeedEl);
+        newDay.appendChild(humidityEl);
+
+        fiveForecastEl.appendChild(newDay);
+    }
+}
+
+// Save to local storage
+var saveWeather = function() {
+    saveObject.history = [...searches];
+    saveObject.last = lastSearch;
+    localStorage.setItem("searches", JSON.stringify(saveObject));
 }
 
 // Handle the search of an old search
@@ -138,6 +213,6 @@ var formSubmitHandler = function(event) {
     }
 }
 
-
+// Listen :)
 userFormEl.addEventListener("submit", formSubmitHandler);
 searchHistoryEl.addEventListener("click", historyHandler);

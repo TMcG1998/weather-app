@@ -11,8 +11,32 @@
     background-color: #ADD8E6;
 }
 
+#today-row {
+    min-height: 250px;
+}
+
+#forecast-row {
+    min-height: 250px;
+}
+
+h4 {
+    margin-top: 10px;
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1440px;
+    }
+}
+
 #five-day-forecast {
-    border-left: 1px solid;
+    margin: 0 5px 10px 0;
+}
+
+.forecast {
+    margin: 0 2px 0 2px;
+    border: 1px solid;
+    border-radius: 5px;
 }
 
 .uv-index {
